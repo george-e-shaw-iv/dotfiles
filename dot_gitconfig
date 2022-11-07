@@ -1,43 +1,8 @@
-# This is Git's per-user configuration file.
+[url "git@github.com:getoutreach"]
+	insteadOf = https://github.com/getoutreach
 [user]
-  name = Jared Allard
-  email = jaredallard@outlook.com
-  #signingKey = 28EAEE7E7A63B17EDB11944B28E0F95E06CA4378
-
-[core]
-  editor = nvim
-
-[github]
-  user = jaredallard
-
-[color]
-  ui = true
-
-[push]
-  default = simple
-
-[format]
-  pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
-  graph = true
-
-[log]
-  abbrevCommit = true
-
-[merge]
-  rebase = true
-
+	email = george.shaw@outreach.io
+[init]
+	defaultBranch = main
 [pull]
-  rebase = true
-
-#[commit]
-#  gpgSign = true
-
-# Bad HTTP
-[url "git@github.com:"]
-  insteadOf = https://gojp:gojp@github.com/
-[url "git@github.com:"]
-  pushInsteadOf = "git://github.com/"
-[url "git@github.com:"]
-  pushInsteadOf = "https://github.com/"
-[url "git@github.com:"]
-	insteadOf = https://github.com/
+	rebase = true

@@ -1,6 +1,5 @@
 #!/usr/bin/env zsh
-
-export PATH="$HOME/.bin:$HOME/go/bin:$HOME/.yarn/bin:${PATH}:$HOME/.cargo/bin"
+    set +o pipefail
 
 # start xorg
 if [[ -t 0 && $(tty) == "/dev/tty1" && ! $DISPLAY ]]; then
@@ -10,9 +9,9 @@ fi
 # autostart tmux if not already running
 if [[ -z "$TMUX" ]]; then
 
-  if ! tmux attach; then
-    exec tmux
-  fi
+ # if ! tmux attach; then
+#    exec tmux
+ # fi
 fi
 
 ### gpg-agent fixes
@@ -61,10 +60,40 @@ fi
 # general aliases
 alias batlvl='echo -e $(cat /sys/class/power_supply/BAT0/capacity)%'
 alias cat='bat --tabs 2'
+alias vim='nvim'
 
-export EDITOR=vim
+export EDITOR=nvim
 
 alias gp='git push'
+alias gs='git switch'
+
+# git switch and pull
+# with no args it switches to main/master, pulls, and fetches
+# with one arg it switches to the given branch and pulls
+gsp() {
+  if [[ "$#" -ne 1 ]]; then
+    local branch='main'
+
+    git rev-parse --verify $branch > /dev/null 2>&1
+    if [[ "$?" -ne 0 ]]; then
+      local branch='master'
+    fi
+
+    gs $branch && git pull origin $branch
+    git fetch
+  else
+    gs $1 && git pull origin $1
+  fi
+}
+
+# git hard restore
+# restores every file and then removes all untracked files
+ghr() {
+  git restore --staged .
+  git restore .
+  git ls-files --others --exclude-standard | xargs -n1 rm
+}
+
 # kubectl
 source <(kubectl completion zsh)
 
