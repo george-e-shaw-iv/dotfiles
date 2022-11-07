@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd "$HOME/.config/i3lock/"
-import -silent -window root window.png;
-i3lock -c "#000000" &
-convert window.png -scale 100% -blur 0x15 -scale 100% lock.png;
-killall i3lock
-i3lock -i lock.png
