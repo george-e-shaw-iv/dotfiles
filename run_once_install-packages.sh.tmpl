@@ -8,26 +8,43 @@ echo "Installing Dependencies"
 {{ if eq .chezmoi.os "darwin" }}
 if ! command -v brew >/dev/null 2>&1; then
   echo " -> Installing Homebrew"
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-if ! command -v antibody >/dev/null 2>&1; then
-  echo " -> Installing Anitbody"
-  brew install antibody
+echo " -> Installing coreutils"
+brew install coreutils
+
+if ! command -v tmux >/dev/null 2>&1; then
+  echo " -> Installing tmux"
+  brew install tmux
+fi
+
+if ! command -v fzf >/dev/null 2>&1; then
+  echo " -> Installing fzf"
+  brew install fzf
+fi
+
+if ! command -v nvim >/dev/null 2>&1; then
+  echo " -> Installing nvim"
+  brew install nvim
+fi
+
+if ! command -v kubectl >/dev/null 2>&1; then
+  echo " -> Installing kubectl"
+  brew install kubectl
+fi
+
+if ! command -v zplug >/dev/null 2>&1; then
+  echo " -> Installing zplug"
+  brew install zplug
+fi
+
+if ! command -v fd >/dev/null 2>&1; then
+  echo " -> Installing fd"
+  brew install fd
 fi
 {{ end }}
 
 {{ if eq .chezmoi.os "linux" }}
-if ! command -v antibody >/dev/null 2>&1; then
-  echo " -> Installing antibody"
-  curl -sfL git.io/antibody | sudo sh -s - -b /usr/local/bin
-fi
+echo "Linux depedencies are unmanaged by chezmoi dotfiles right now."
 {{ end }}
-
-echo "Running configuration tool(s)"
-
-echo " -> Running Antibody"
-ssh-keyscan github.com > ~/.ssh/known_hosts
-antibody bundle < ~/.zsh_plugins.txt > ~/.zsh_plugins.sh
-
-echo "Done! Don't forget to commit changes :)"
