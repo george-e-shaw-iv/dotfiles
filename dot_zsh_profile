@@ -1,11 +1,6 @@
 #!/usr/bin/env zsh
 set +o pipefail
 
-# start xorg
-if [[ -t 0 && $(tty) == "/dev/tty1" && ! $DISPLAY ]]; then
- exec startx
-fi
-
 # tmux autostart (supplied by plugins/tmux from oh-my-zsh)
 export ZSH_TMUX_AUTOSTART=true
 
