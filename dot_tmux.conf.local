@@ -179,7 +179,7 @@ tmux_conf_theme_right_separator_sub='|'
 #     - #{username}
 #     - #{username_ssh}
 tmux_conf_theme_status_left=''
-tmux_conf_theme_status_right='#(kubectl config current-context) #[fg=colour198,bg=colour16] %H:%M '
+tmux_conf_theme_status_right='#(kubectl config current-context):#(kubens -c) #[fg=colour198,bg=colour16] %H:%M '
 
 # status left style
 tmux_conf_theme_status_left_fg='#000000,#e4e4e4,#e4e4e4'  # black, white , white

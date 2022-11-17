@@ -43,7 +43,6 @@ if ! kubectl krew list | grep ns >/dev/null 2>&1; then
 fi
 
 # general aliases
-alias batlvl='echo -e $(cat /sys/class/power_supply/BAT0/capacity)%'
 alias cat='bat --tabs 2'
 alias vim='nvim'
 
