@@ -6,9 +6,6 @@ if [[ -t 0 && $(tty) == "/dev/tty1" && ! $DISPLAY ]]; then
  exec startx
 fi
 
-### gpg-agent fixes
-export GPG_TTY=$(tty)
-
 # tmux autostart (supplied by plugins/tmux from oh-my-zsh)
 export ZSH_TMUX_AUTOSTART=true
 
@@ -23,6 +20,11 @@ source $ZPLUG_HOME/init.zsh
 zplug "themes/robbyrussell", as:theme, from:oh-my-zsh
 zplug "plugins/tmux", as:plugin, from:oh-my-zsh
 zplug "plugins/fzf", as:plugin, from:oh-my-zsh
+zplug "plugins/kubectl", as:plugin, from:oh-my-zsh
+zplug "plugins/asdf", as:plugin, from:oh-my-zsh
+zplug "plugins/gpg-agent", as:plugin, from:oh-my-zsh
+zplug "zsh-users/zsh-autosuggestions", as:plugin, from:github
+zplug "zsh-users/zsh-syntax-highlighting", as:plugin, from:github
 
 if ! zplug check --verbose; then
     printf "Install? [y/N]: "
@@ -33,24 +35,11 @@ fi
 
 zplug load
 
-# Find where asdf should be installed
-ASDF_DIR="${ASDF_DIR:-$HOME/.asdf}"
-ASDF_COMPLETIONS="$ASDF_DIR/completions"
+# add krew (kubectl plugin manager) to $PATH
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
-# If not found, check for Homebrew package
-if [[ ! -f "$ASDF_DIR/asdf.sh" ]] && command -v brew >/dev/null; then
-   ASDF_DIR="/usr/local/opt/asdf"
-   ASDF_COMPLETIONS="$ASDF_DIR/etc/bash_completion.d"
-fi
-
-# Load command
-if [[ -f "$ASDF_DIR/asdf.sh" ]]; then
-    . "$ASDF_DIR/asdf.sh"
-
-    # Load completions
-    if [[ -f "$ASDF_COMPLETIONS/asdf.bash" ]]; then
-        . "$ASDF_COMPLETIONS/asdf.bash"
-    fi
+if ! kubectl krew list | grep ns >/dev/null 2>&1; then
+  kubectl krew install ns
 fi
 
 # general aliases
@@ -89,40 +78,3 @@ ghr() {
   git restore .
   git ls-files --others --exclude-standard | xargs -n1 rm
 }
-
-# kubectl
-source <(kubectl completion zsh)
-
-# my aliases for kubectl
-alias k=kubectl
-
-# kubectl get
-alias kg='k get'
-alias kgp='kg pod'
-alias kgs='kg service'
-alias kgd='kg deployment'
-alias kgse='kg secret'
-alias kgss='kg statefulset'
-alias kgn='kg node'
-
-# kubectl describe
-alias kd='k describe'
-alias kdp='kd pod'
-alias kds='kd service'
-alias kdd='kd deployment'
-alias kdse='kd secret'
-alias kdss='kd statefulset'
-alias kdn='kd node'
-
-# kubectl delete 
-alias kde='k delete'
-alias kdep='kde pod'
-alias kdes='kde svc'
-alias kded='kde deployment'
-alias kdese='kde secret'
-alias kdess='kde statefulset'
-
-# misc
-alias ke='k exec -it'
-alias kl='k logs -f'
-alias sudo='sudo -E'
