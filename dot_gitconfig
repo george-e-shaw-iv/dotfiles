@@ -1,8 +1,0 @@
-[url "git@github.com:getoutreach"]
-	insteadOf = https://github.com/getoutreach
-[user]
-	email = george.shaw@outreach.io
-[init]
-	defaultBranch = main
-[pull]
-	rebase = true
