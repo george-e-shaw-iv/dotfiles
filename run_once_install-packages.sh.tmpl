@@ -1,56 +1,112 @@
 #!/usr/bin/env bash
 #
-# Install initial packages.
+# Runs once to bootstrap new machines.
 
-echo "running first init on {{ .chezmoi.os }}"
+set -euo pipefail
 
-echo "Installing Dependencies"
-{{ if eq .chezmoi.os "darwin" }}
-if ! command -v brew >/dev/null 2>&1; then
-  echo " -> Installing Homebrew"
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+OS="{{ .chezmoi.os }}"
+
+# This is the 1password auth socket used for signing commits which is semi-deterministic
+# based off of operating system (it is deterministic for OSX and Linux, but not WSL).
+GIT_GPG_AUTH_SOCKET_PATH=""
+
+echo "Attempting to bootstrap operating system \"$OS\" using george-e-shaw-iv/dotfiles"
+
+if [[ "$OS" == "darwin" ]]; then
+  GIT_GPG_AUTH_SOCKET_PATH="/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+  if ! command -v brew >/dev/null 2>&1; then
+    echo " -> Installing Homebrew"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+
+  echo " -> Installing Brew Packages"
+  brew bundle --no-lock --file=/dev/stdin <<EOF
+brew 'mise'
+brew 'bash' # osx doesn't ship with the latest bash
+brew 'zsh'
+brew 'chezmoi' # ensure we have chezmoi post-install
+brew 'coreutils'
+brew 'tmux'
+brew 'fzf'
+brew 'nvim'
+brew 'kubectl'
+brew 'fd'
+brew 'bat'
+brew 'lsd'
+brew 'jq'
+brew 'wget'
+brew 'gh'
+
+cask "1password-cli"
+cask "1password" unless File.directory?('/Applications/1Password.app')
+cask "google-chrome" unless File.directory?('/Applications/Google Chrome.app')
+cask "visual-studio-code" unless File.directory?('/Applications/Visual Studio Code.app')
+cask "iterm2" unless File.directory?('/Applications/iTerm.app')
+EOF
+elif [[ "$OS" == "linux" ]] && command -v apt &>/dev/null; then
+  GIT_GPG_AUTH_SOCKET_PATH="/opt/1Password/op-ssh-sign"
+  if command -v systemd-detect-virt &>/dev/null && [[ "$(systemd-detect-virt)" == "wsl" ]]; then
+    GIT_GPG_AUTH_SOCKET_PATH="/mnt/c/Users/georg/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
+  fi
+
+  echo " -> Refreshing Packages Index"
+  sudo apt-get update -y
+  
+  echo " -> Install APT Requirements"
+  sudo apt-get install -y ca-certificates curl gnupg wget
+  sudo mkdir -p -m 755 /etc/apt/keyrings
+
+  echo " -> Setting up APT Repositories"
+  # Kubernetes
+  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+  sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
+
+  # Github CLI
+  wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+  sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+
+  # Docker
+  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  sudo chmod a+r /etc/apt/keyrings/docker.asc
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+  # mise
+  wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg 1> /dev/null
+  echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=$(dpkg --print-architecture)] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
+
+  echo " -> Installing System Packages"
+  sudo apt-get update -y
+  sudo apt-get install -y tmux fzf neovim bat kubectl gh zsh docker-ce-cli lsd jq wget mise
+  sudo apt-get install -y --no-install-recommends xdg-utils
+
+  if [[ -e "bin/chezmoi" ]]; then
+    echo " -> Persisting chezmoi Installation"
+    sudo cp bin/chezmoi /usr/local/bin/chezmoi
+    rm -rf bin/
+  fi
+
+  echo " -> Setting zsh as Default Shell"
+  chsh "$(whoami)" --shell "$(command -v zsh)"
+elif [[ "$OS" == "linux" ]]; then
+  echo "Only debian-based linux distrobutions are officially supported" 1>&2
+  exit 1
+else
+  echo "Unsupported operating system \"$OS\" detected" 1>&2
+  exit 1
 fi
-
-echo " -> Installing coreutils"
-brew install coreutils
-
-if ! command -v tmux >/dev/null 2>&1; then
-  echo " -> Installing tmux"
-  brew install tmux
-fi
-
-if ! command -v fzf >/dev/null 2>&1; then
-  echo " -> Installing fzf"
-  brew install fzf
-fi
-
-if ! command -v nvim >/dev/null 2>&1; then
-  echo " -> Installing nvim"
-  brew install nvim
-fi
-
-if ! command -v kubectl >/dev/null 2>&1; then
-  echo " -> Installing kubectl"
-  brew install kubectl
-fi
-
-if ! command -v zplug >/dev/null 2>&1; then
-  echo " -> Installing zplug"
-  brew install zplug
-fi
-
-if ! command -v fd >/dev/null 2>&1; then
-  echo " -> Installing fd"
-  brew install fd
-fi
-{{ end }}
-
-{{ if eq .chezmoi.os "linux" }}
-echo "Linux depedencies are unmanaged by chezmoi dotfiles right now."
-{{ end }}
 
 echo " -> Installing krew"
 (
+  # Enter a new scope, this is all code copied directly from their installation instructions that
+  # I don't want to conflict with anything else. Their installation is platform agnostic (at least
+  # between OSX and linux).
   set -x; cd "$(mktemp -d)" &&
   OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
   ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
@@ -59,3 +115,29 @@ echo " -> Installing krew"
   tar zxvf "${KREW}.tar.gz" &&
   ./"${KREW}" install krew
 )
+
+if ! gh auth status &>/dev/null; then
+  echo " -> Authenticating gh"
+  gh auth login
+fi
+
+echo " -> Writing gitconfig"
+cat > ~/.gitconfig <<EOL
+[credential "https://github.com"]
+        helper = 
+        helper = !/usr/bin/gh auth git-credential
+[init]
+        defaultBranch = main
+[user]
+        email = george.e.shaw.iv@outlook.com
+        name = George Shaw
+        signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILaE/s5mLGFJ+eOzQV0d2VibHcYC9LC1ARnbCibne59q
+[core]
+        editor = vim
+[gpg]
+        format = ssh
+[gpg "ssh"]
+        program = "${GIT_GPG_AUTH_SOCKET_PATH}"
+[commit]
+        gpgsign = true
+EOL

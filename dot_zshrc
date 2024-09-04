@@ -11,4 +11,4 @@ started=$(get_time_ms)
 source ~/.zsh_profile
 finished=$(get_time_ms)
 diff=$((finished-started))
-echo " --> loaded zshrc in $diff milliseconds"
+echo " --> Loaded ~/.zshrc in ${diff}ms"
