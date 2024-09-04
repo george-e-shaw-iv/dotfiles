@@ -5,11 +5,14 @@ set +o pipefail
 export ZSH_TMUX_AUTOSTART=true
 
 # fzf environment variables (fzf support supplied by plugins/fzf from oh-my-sh)
-export FZF_BASE=/opt/homebrew/opt/fzf
+export FZF_BASE="$(dirname $(which fzf))"
 export FZF_DEFAULT_COMMAND=fd
 
 ### Plugins (managed by zplug)
-export ZPLUG_HOME=/opt/homebrew/opt/zplug
+export ZPLUG_HOME=/home/george/.zplug
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export ZPLUG_HOME=/opt/homebrew/opt/zplug
+fi
 source $ZPLUG_HOME/init.zsh
 
 zplug "themes/robbyrussell", as:theme, from:oh-my-zsh
@@ -35,6 +38,16 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 if ! kubectl krew list | grep ns >/dev/null 2>&1; then
   kubectl krew install ns
+fi
+
+# ensure xdg-open works on WSL
+if command -v systemd-detect-virt &>/dev/null && [[ "$(systemd-detect-virt)" == "wsl" ]]; then
+  export BROWSER="powershell.exe start"
+fi
+
+# apt installations of bat install as "batcat"
+if command -v batcat &>/dev/null; then
+  alias bat='batcat'
 fi
 
 # general aliases
