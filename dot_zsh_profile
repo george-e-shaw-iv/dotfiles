@@ -21,6 +21,7 @@ zplug "plugins/fzf", as:plugin, from:oh-my-zsh
 zplug "plugins/kubectl", as:plugin, from:oh-my-zsh
 zplug "plugins/asdf", as:plugin, from:oh-my-zsh
 zplug "plugins/gpg-agent", as:plugin, from:oh-my-zsh
+zplug "plugins/mise", as:plugin, from:oh-my-zsh
 zplug "zsh-users/zsh-autosuggestions", as:plugin, from:github
 zplug "zsh-users/zsh-syntax-highlighting", as:plugin, from:github
 
@@ -40,9 +41,13 @@ if ! kubectl krew list | grep ns >/dev/null 2>&1; then
   kubectl krew install ns
 fi
 
-# ensure xdg-open works on WSL
 if command -v systemd-detect-virt &>/dev/null && [[ "$(systemd-detect-virt)" == "wsl" ]]; then
+  # ensure xdg-open works on WSL
   export BROWSER="powershell.exe start"
+
+  # some applications, like vscode, use this envvar to figure out they're being launched from WSL
+  # this exists already in bash on login, but the envvar isn't ported into zsh
+  export WSL_DISTRO_NAME="$(IFS='\'; x=($(wslpath -w /)); echo "${x[${#x[@]}-1]}")"
 fi
 
 # apt installations of bat install as "batcat"
