@@ -38,6 +38,7 @@ brew 'jq'
 brew 'wget'
 brew 'gh'
 
+cask "docker" unless File.directory?('/Applications/Docker.app')
 cask "1password-cli"
 cask "1password" unless File.directory?('/Applications/1Password.app')
 cask "google-chrome" unless File.directory?('/Applications/Google Chrome.app')
