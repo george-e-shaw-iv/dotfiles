@@ -10,10 +10,15 @@ OS="{{ .chezmoi.os }}"
 # based off of operating system (it is deterministic for OSX and Linux, but not WSL).
 GIT_GPG_AUTH_SOCKET_PATH=""
 
+# This is the path to the gh binary which helps us authenticate with GitHub to push/pull.
+# This path differs between OSX and Linux/WSL.
+GH_PATH=""
+
 echo "Attempting to bootstrap operating system \"$OS\" using george-e-shaw-iv/dotfiles"
 
 if [[ "$OS" == "darwin" ]]; then
   GIT_GPG_AUTH_SOCKET_PATH="/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+  GH_PATH="/opt/homebrew/bin/gh"
 
   if ! command -v brew >/dev/null 2>&1; then
     echo " -> Installing Homebrew"
@@ -47,6 +52,7 @@ cask "iterm2" unless File.directory?('/Applications/iTerm.app')
 EOF
 elif [[ "$OS" == "linux" ]] && command -v apt &>/dev/null; then
   GIT_GPG_AUTH_SOCKET_PATH="/opt/1Password/op-ssh-sign"
+  GH_PATH="/usr/bin/gh"
   if command -v systemd-detect-virt &>/dev/null && [[ "$(systemd-detect-virt)" == "wsl" ]]; then
     GIT_GPG_AUTH_SOCKET_PATH="/mnt/c/Users/georg/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
   fi
@@ -126,7 +132,7 @@ echo " -> Writing gitconfig"
 cat > ~/.gitconfig <<EOL
 [credential "https://github.com"]
         helper = 
-        helper = !/usr/bin/gh auth git-credential
+        helper = !${GH_PATH} auth git-credential
 [init]
         defaultBranch = main
 [user]
