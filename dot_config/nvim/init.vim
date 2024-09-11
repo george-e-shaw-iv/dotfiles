@@ -74,3 +74,6 @@ noremap <c-f> :FindStandard
 
 " <Ctrl-l> redraws the screen and removes any search highlighting.
 nnoremap <silent> <C-l> :nohl<CR><C-l>
+
+" initialize lua/init.lua for lazy.nvim
+lua require('init')

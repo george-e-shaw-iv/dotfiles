@@ -19,7 +19,6 @@ zplug "themes/robbyrussell", as:theme, from:oh-my-zsh
 zplug "plugins/tmux", as:plugin, from:oh-my-zsh
 zplug "plugins/fzf", as:plugin, from:oh-my-zsh
 zplug "plugins/kubectl", as:plugin, from:oh-my-zsh
-zplug "plugins/asdf", as:plugin, from:oh-my-zsh
 zplug "plugins/gpg-agent", as:plugin, from:oh-my-zsh
 zplug "plugins/mise", as:plugin, from:oh-my-zsh
 zplug "zsh-users/zsh-autosuggestions", as:plugin, from:github
@@ -91,3 +90,6 @@ ghr() {
   git restore .
   git ls-files --others --exclude-standard | xargs -n1 rm
 }
+
+# Ensure mise is in $PATH
+export PATH="$HOME/.local/share/mise/shims:$PATH"
