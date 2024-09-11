@@ -3,7 +3,7 @@ let g:is_posix = 1                                " use proper syntax highlighti
 set virtualedit=onemore                           " navigate to the true end of the line
 set autochdir                                     " synchronize vim's cwd with the cwd of the current
 set timeout timeoutlen=300 ttimeoutlen=300        " timeout for binding sequences
-set nu                                            " line numbers
+set nu rnu                                        " hybrid relative line numbers
 set laststatus=2                                  " always show status line
 set backspace=2                                   " backspace legit
 set mouse-=a                                      " disable mouse usage
@@ -15,6 +15,7 @@ set noerrorbells                                  " fthatsh
 set noswapfile                                    " save often don't worry about messy garbage
 set nobackup                                      " ditto
 set nowrap                                        " don't word wrap
+set clipboard=unnamed                             " use system clipboard
 let loaded_matchparen = 1                         " don't highlight matched parens
 let g:tmuxline_preset = 'nightly_fox'             " tmuxline status
 
