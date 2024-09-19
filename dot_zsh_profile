@@ -36,13 +36,6 @@ fi
 
 zplug load
 
-# add krew (kubectl plugin manager) to $PATH
-export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-
-if ! kubectl krew list | grep ns >/dev/null 2>&1; then
-  kubectl krew install ns
-fi
-
 if command -v systemd-detect-virt &>/dev/null && [[ "$(systemd-detect-virt)" == "wsl" ]]; then
   # ensure xdg-open works on WSL
   export BROWSER="powershell.exe start"
