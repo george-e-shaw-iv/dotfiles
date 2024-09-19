@@ -1,5 +1,8 @@
 #!/usr/bin/env zsh
-set +o pipefail
+
+# use emacs keybinds in zsh, this is mostly to just not accidentlaly go into vi
+# command mode if escape gets pressed (or an escape sequence leaks)
+bindkey -e
 
 # tmux autostart (supplied by plugins/tmux from oh-my-zsh)
 export ZSH_TMUX_AUTOSTART=true
@@ -91,5 +94,8 @@ ghr() {
   git ls-files --others --exclude-standard | xargs -n1 rm
 }
 
-# Ensure mise is in $PATH
+# Ensure mise-installed binaries are in $PATH
 export PATH="$HOME/.local/share/mise/shims:$PATH"
+
+# Ensure krew is in $PATH
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"

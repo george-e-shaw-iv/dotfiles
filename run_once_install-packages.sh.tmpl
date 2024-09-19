@@ -125,6 +125,14 @@ echo " -> Installing krew"
   ./"${KREW}" install krew
 )
 
+# Append krew binary location into $PATH within the context of this script to be able to install
+# kubectl plugins.
+PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+echo " -> Installing kubectl plugins"
+kubectl krew install ctx
+kubectl krew install ns
+
 if ! gh auth status &>/dev/null; then
   echo " -> Authenticating gh"
   gh auth login
