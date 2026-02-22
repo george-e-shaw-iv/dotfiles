@@ -56,7 +56,7 @@ elif [[ "$OS" == "linux" ]] && command -v apt &>/dev/null; then
   GIT_GPG_AUTH_SOCKET_PATH="/opt/1Password/op-ssh-sign"
   GH_PATH="/usr/bin/gh"
   if command -v systemd-detect-virt &>/dev/null && [[ "$(systemd-detect-virt)" == "wsl" ]]; then
-    GIT_GPG_AUTH_SOCKET_PATH="/mnt/c/Users/georg/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
+    GIT_GPG_AUTH_SOCKET_PATH="/mnt/c/Users/georg/AppData/Local/Microsoft/WindowsApps/op-ssh-sign-wsl.exe"
   fi
 
   echo " -> Refreshing Packages Index"

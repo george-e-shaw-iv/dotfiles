@@ -92,3 +92,6 @@ export PATH="$HOME/.local/share/mise/shims:$PATH"
 
 # Ensure krew is in $PATH
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+# claude?
+export PATH="$HOME/.local/bin:$PATH"
