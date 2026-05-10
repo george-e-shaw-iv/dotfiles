@@ -12,7 +12,7 @@ export FZF_BASE="$(dirname $(which fzf))"
 export FZF_DEFAULT_COMMAND=fd
 
 ### Plugins (managed by zplug)
-export ZPLUG_HOME=/home/george/.zplug
+export ZPLUG_HOME=$HOME/.zplug
 if [[ "$OSTYPE" == "darwin"* ]]; then
   export ZPLUG_HOME=/opt/homebrew/opt/zplug
 fi
