@@ -133,6 +133,9 @@ echo " -> Installing kubectl plugins"
 kubectl krew install ctx
 kubectl krew install ns
 
+# Install zplug
+curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh
+
 if ! gh auth status &>/dev/null; then
   echo " -> Authenticating gh"
   gh auth login
