@@ -101,8 +101,13 @@ Signed-By: /etc/apt/keyrings/docker.asc
 
   echo " -> Installing System Packages"
   sudo apt-get update -y
-  sudo apt-get install -y build-essential tmux fzf neovim bat kubectl gh zsh lsd jq wget mise docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  sudo apt-get install -y build-essential tmux fzf bat kubectl gh zsh lsd jq wget mise docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
   sudo apt-get install -y --no-install-recommends xdg-utils
+
+  # neovim (apt usually has an outdated version) (/opt/nvim-linux-x86_64/bin is added to $PATH in ~/.zsh_profile)
+  curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+  sudo rm -rf /opt/nvim-linux-x86_64
+  sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
 
   if [[ -e "bin/chezmoi" ]]; then
     echo " -> Persisting chezmoi Installation"

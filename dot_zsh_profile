@@ -95,3 +95,6 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
 # claude?
 export PATH="$HOME/.local/bin:$PATH"
+
+# neovim
+export PATH="/opt/nvim-linux-x84_64/bin:$PATH"
